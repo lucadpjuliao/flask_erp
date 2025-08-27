@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - CRM Profissional{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Dashboard</h1>
+    <div>
+        <span class="text-muted">Bem-vindo, {{ current_user.first_name }}!</span>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="stats-number">{{ total_clients }}</div>
+                    <div>Total de Clientes</div>
+                </div>
+                <div class="flex-shrink-0">
+                    <i class="fas fa-users fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="stats-number">{{ active_leads }}</div>
+                    <div>Leads Ativos</div>
+                </div>
+                <div class="flex-shrink-0">
+                    <i class="fas fa-bullseye fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card" style="background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="stats-number">{{ closed_leads }}</div>
+                    <div>Leads Fechados</div>
+                </div>
+                <div class="flex-shrink-0">
+                    <i class="fas fa-trophy fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card" style="background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="stats-number">{{ pending_tasks }}</div>
+                    <div>Tarefas Pendentes</div>
+                </div>
+                <div class="flex-shrink-0">
+                    <i class="fas fa-tasks fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Leads por Status -->
+    <div class="col-xl-8 col-lg-7 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">Pipeline de Vendas</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="leadsChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tarefas Próximas -->
+    <div class="col-xl-4 col-lg-5 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">Próximas Tarefas</h6>
+            </div>
+            <div class="card-body">
+                {% if upcoming_tasks %}
+                    {% for task in upcoming_tasks %}
+                        <div class="d-flex align-items-center mb-3 p-2 bg-light rounded">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ task.title }}</h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    {{ task.due_date.strftime('%d/%m %H:%M') if task.due_date }}
+                                </small>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <span class="badge priority-{{ task.priority }}">{{ task.priority|title }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="text-center">
+                        <a href="{{ url_for('tasks') }}" class="btn btn-sm btn-outline-primary">Ver Todas</a>
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-check-circle fa-3x mb-3"></i>
+                        <p>Nenhuma tarefa próxima!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Leads Recentes -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold">Leads Recentes</h6>
+                <a href="{{ url_for('leads') }}" class="btn btn-sm btn-outline-light">Ver Todos</a>
+            </div>
+            <div class="card-body">
+                {% if recent_leads %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Cliente</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                    <th>Responsável</th>
+                                    <th>Data</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lead in recent_leads %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ url_for('view_lead', id=lead.id) }}" class="text-decoration-none">
+                                                {{ lead.title }}
+                                            </a>
+                                        </td>
+                                        <td>{{ lead.client.name if lead.client else '-' }}</td>
+                                        <td>
+                                            {% if lead.value %}
+                                                R$ {{ "%.2f"|format(lead.value) }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge status-{{ lead.status }}">{{ lead.status|title }}</span>
+                                        </td>
+                                        <td>{{ lead.assigned_user.first_name }} {{ lead.assigned_user.last_name }}</td>
+                                        <td>{{ lead.created_at.strftime('%d/%m/%Y') }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-bullseye fa-3x mb-3"></i>
+                        <p>Nenhum lead encontrado.</p>
+                        <a href="{{ url_for('new_lead') }}" class="btn btn-primary">Criar Primeiro Lead</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Gráfico de Leads por Status
+const ctx = document.getElementById('leadsChart').getContext('2d');
+const leadsData = {
+    labels: [{% for status, count in leads_by_status %}'{{ status|title }}'{% if not loop.last %},{% endif %}{% endfor %}],
+    datasets: [{
+        data: [{% for status, count in leads_by_status %}{{ count }}{% if not loop.last %},{% endif %}{% endfor %}],
+        backgroundColor: [
+            '#17a2b8', // novo
+            '#ffc107', // qualificado  
+            '#fd7e14', // proposta
+            '#6f42c1', // negociacao
+            '#28a745', // fechado
+            '#dc3545'  // perdido
+        ],
+        borderWidth: 0
+    }]
+};
+
+new Chart(ctx, {
+    type: 'doughnut',
+    data: leadsData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

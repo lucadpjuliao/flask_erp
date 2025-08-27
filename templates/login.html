@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Login - CRM Profissional{% endblock %}
+
+{% block login_content %}
+<div class="container-fluid vh-100">
+    <div class="row h-100">
+        <div class="col-md-6 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="text-center text-white">
+                <i class="fas fa-chart-line fa-5x mb-4"></i>
+                <h1 class="display-4 fw-bold">CRM Profissional</h1>
+                <p class="lead">Sistema completo de gestão de relacionamento com clientes</p>
+                <div class="row mt-5">
+                    <div class="col-4">
+                        <i class="fas fa-users fa-2x mb-2"></i>
+                        <p>Gestão de Clientes</p>
+                    </div>
+                    <div class="col-4">
+                        <i class="fas fa-bullseye fa-2x mb-2"></i>
+                        <p>Pipeline de Vendas</p>
+                    </div>
+                    <div class="col-4">
+                        <i class="fas fa-chart-bar fa-2x mb-2"></i>
+                        <p>Relatórios</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 d-flex align-items-center justify-content-center bg-light">
+            <div class="card shadow-lg border-0" style="width: 400px;">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <h3 class="card-title">Fazer Login</h3>
+                        <p class="text-muted">Entre com suas credenciais</p>
+                    </div>
+                    
+                    <!-- Flash Messages -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.username.label(class="form-label") }}
+                            {{ form.username(class="form-control form-control-lg", placeholder="Digite seu usuário") }}
+                            {% if form.username.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.username.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.password.label(class="form-label") }}
+                            {{ form.password(class="form-control form-control-lg", placeholder="Digite sua senha") }}
+                            {% if form.password.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.password.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            {{ form.remember_me(class="form-check-input") }}
+                            {{ form.remember_me.label(class="form-check-label") }}
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>Entrar
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="text-center mt-4">
+                        <a href="#" class="text-decoration-none">Esqueceu a senha?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
