@@ -1,60 +1,46 @@
-# CRM Profissional
+# 🚀 CRM Profissional
 
-Um sistema CRM (Customer Relationship Management) completo, desenvolvido com Flask (Python) no back-end e um front-end moderno, responsivo e intuitivo. O sistema visa facilitar a gestão de clientes, leads, contatos, oportunidades de venda, tarefas e equipes de forma centralizada, segura e escalável.
+Sistema completo de gestão de relacionamento com clientes desenvolvido em Flask.
 
-## 🔧 Tecnologias Utilizadas
+## ⚡ Instalação Rápida
 
-- **Back-End:** Flask, Flask-SQLAlchemy, Flask-Migrate, Flask-WTF, Flask-Login, Flask-Mail
-- **Banco de Dados:** PostgreSQL (recomendado) ou SQLite (desenvolvimento)
-- **Front-End:** HTML5, CSS3, Bootstrap 5, JavaScript (AJAX, jQuery)
-- **Autenticação:** Flask-Login com sessão segura
-- **Validações:** WTForms + validações personalizadas
-
-## 🚀 Instalação e Configuração
-
-### 1. Clone o repositório
+### Opção 1: Setup Automático (Recomendado)
 ```bash
-git clone <seu-repositorio>
-cd crm-profissional
+# 1. Clone o repositório
+git clone https://github.com/lucadpjuliao/flask_erp.git
+cd flask_erp
+
+# 2. Execute o setup automático
+python setup.py
+
+# 3. Execute a aplicação
+python run.py
 ```
 
-### 2. Crie um ambiente virtual
+### Opção 2: Instalação Manual
 ```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# ou
-venv\Scripts\activate  # Windows
-```
+# 1. Instalar dependências
+pip install Flask Flask-SQLAlchemy Flask-Migrate Flask-Login Flask-WTF Flask-Mail WTForms Werkzeug python-dotenv email-validator
 
-### 3. Instale as dependências
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Configure as variáveis de ambiente
-```bash
-cp .env.example .env
-# Edite o arquivo .env com suas configurações
-```
-
-### 5. Inicialize o banco de dados
-```bash
+# 2. Inicializar banco
 python init_db.py
-```
 
-### 6. Execute a aplicação
-```bash
+# 3. Executar aplicação
 python app.py
 ```
 
-A aplicação estará disponível em `http://localhost:5000`
+## 🌐 Acesso ao Sistema
 
-## 👤 Usuários Padrão
-
-Após a inicialização do banco de dados, os seguintes usuários estarão disponíveis:
-
-- **Administrador:** admin / admin123
+- **URL:** http://localhost:5000
+- **Admin:** admin / admin123
 - **Vendedor:** vendedor1 / vendedor123
+
+## 🔧 Tecnologias
+
+- **Backend:** Flask, SQLAlchemy
+- **Frontend:** Bootstrap 5, JavaScript
+- **Banco:** SQLite (desenvolvimento)
+- **Autenticação:** Flask-Login
 
 ## ✅ Funcionalidades Implementadas
 

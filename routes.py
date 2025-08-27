@@ -2,7 +2,7 @@ from flask import render_template, request, redirect, url_for, flash, jsonify, s
 from flask_login import login_user, login_required, logout_user, current_user
 from sqlalchemy import or_, and_, func
 from datetime import datetime, timedelta
-from app import db
+from database import db
 from models import User, Client, Lead, Task, Interaction, Team
 from forms import LoginForm, ClientForm, LeadForm, TaskForm, InteractionForm, UserForm, SearchForm
 

@@ -3,7 +3,8 @@
 Script para inicializar o banco de dados e criar usuário administrador
 """
 
-from app import app, db
+from app import app
+from database import db
 from models import User, Team
 from werkzeug.security import generate_password_hash
 
