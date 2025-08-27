@@ -32,8 +32,10 @@ python app.py
 ## 🌐 Acesso ao Sistema
 
 - **URL:** http://localhost:5000
-- **Admin:** admin / admin123
-- **Vendedor:** vendedor1 / vendedor123
+- **👤 ADMIN:** `admin` / `admin123`
+- **👤 Vendedor:** `vendedor1` / `vendedor123`
+
+> ⚠️ **IMPORTANTE:** Os usuários são criados automaticamente na primeira execução!
 
 ## 🔧 Tecnologias
 
@@ -41,6 +43,28 @@ python app.py
 - **Frontend:** Bootstrap 5, JavaScript
 - **Banco:** SQLite (desenvolvimento)
 - **Autenticação:** Flask-Login
+
+## 🛠️ Solução de Problemas
+
+### ❌ "Usuário ou senha inválidos"
+```bash
+# O usuário admin é criado automaticamente, mas se houver problemas:
+python reset_db.py  # Reseta o banco e recria usuários
+```
+
+### ❌ "ModuleNotFoundError"
+```bash
+# Instale as dependências:
+pip install Flask Flask-SQLAlchemy Flask-Login Flask-WTF Flask-Mail WTForms python-dotenv email-validator
+```
+
+### ❌ Banco de dados corrompido
+```bash
+# Delete o arquivo crm.db e execute novamente:
+rm crm.db  # Linux/Mac
+del crm.db  # Windows
+python app.py
+```
 
 ## ✅ Funcionalidades Implementadas
 

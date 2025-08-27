@@ -41,9 +41,80 @@ def create_app():
     
     return app
 
+def create_default_users():
+    """Cria usuários padrão se não existirem"""
+    from models import User, Team
+    
+    try:
+        # Verificar se já existe usuário admin
+        admin_user = User.query.filter_by(username='admin').first()
+        if admin_user:
+            print("✅ Usuário admin já existe")
+            return
+        
+        print("🔄 Criando usuários padrão...")
+        
+        # Criar equipe padrão se não existir
+        default_team = Team.query.filter_by(name='Equipe Geral').first()
+        if not default_team:
+            default_team = Team(
+                name='Equipe Geral',
+                description='Equipe padrão do sistema'
+            )
+            db.session.add(default_team)
+            db.session.flush()
+        
+        # Criar usuário administrador
+        admin_user = User(
+            username='admin',
+            email='admin@crm.com',
+            first_name='Administrador',
+            last_name='Sistema',
+            role='admin',
+            active=True,
+            team_id=default_team.id
+        )
+        admin_user.set_password('admin123')
+        db.session.add(admin_user)
+        
+        # Criar usuário vendedor de exemplo
+        seller_exists = User.query.filter_by(username='vendedor1').first()
+        if not seller_exists:
+            seller_user = User(
+                username='vendedor1',
+                email='vendedor@crm.com',
+                first_name='João',
+                last_name='Silva',
+                role='vendedor',
+                active=True,
+                team_id=default_team.id
+            )
+            seller_user.set_password('vendedor123')
+            db.session.add(seller_user)
+        
+        db.session.commit()
+        print("✅ Usuários padrão criados:")
+        print("   👤 Admin: admin / admin123")
+        print("   👤 Vendedor: vendedor1 / vendedor123")
+        
+    except Exception as e:
+        print(f"❌ Erro ao criar usuários padrão: {e}")
+        db.session.rollback()
+
 app = create_app()
 
 if __name__ == '__main__':
     with app.app_context():
+        print("🔄 Inicializando banco de dados...")
         db.create_all()
+        print("✅ Tabelas criadas!")
+        
+        # Criar usuários padrão automaticamente
+        create_default_users()
+        
+        print("🚀 Iniciando servidor...")
+        print("📱 Acesse: http://localhost:5000")
+        print("👤 Login: admin / admin123")
+        print("-" * 50)
+    
     app.run(debug=True, host='0.0.0.0', port=5000)
