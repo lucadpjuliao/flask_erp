@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from database import db
 from models import User, Client, Lead, Task, Interaction, Team
 from forms import LoginForm, ClientForm, LeadForm, TaskForm, InteractionForm, UserForm, SearchForm
+from lead_functions import LeadManager
 
 def register_routes(app):
     @app.route('/')
@@ -261,6 +262,104 @@ def register_routes(app):
         users = User.query.filter_by(active=True).all()
         
         return render_template('tasks/list.html', tasks=tasks, search_form=search_form, users=users)
+
+    # API AVANÇADAS PARA LEADS
+    @app.route('/api/leads/analytics')
+    @login_required
+    def leads_analytics():
+        """API para análises de leads"""
+        period_days = request.args.get('period', 30, type=int)
+        user_id = request.args.get('user_id', type=int)
+        
+        # Se não for admin/gerente, só pode ver seus próprios dados
+        if current_user.role == 'vendedor':
+            user_id = current_user.id
+        
+        result = LeadManager.get_lead_analytics(user_id, period_days)
+        return jsonify(result)
+
+    @app.route('/api/leads/priority')
+    @login_required
+    def leads_by_priority():
+        """API para leads por prioridade"""
+        user_id = current_user.id if current_user.role == 'vendedor' else None
+        result = LeadManager.get_leads_by_priority(user_id)
+        return jsonify(result)
+
+    @app.route('/api/leads/forecast')
+    @login_required
+    def revenue_forecast():
+        """API para previsão de receita"""
+        months = request.args.get('months', 3, type=int)
+        result = LeadManager.forecast_revenue(months)
+        return jsonify(result)
+
+    @app.route('/api/leads/overdue')
+    @login_required
+    def overdue_leads():
+        """API para leads em atraso"""
+        result = LeadManager.get_overdue_leads()
+        return jsonify(result)
+
+    @app.route('/leads/<int:id>/update-status', methods=['POST'])
+    @login_required
+    def update_lead_status_advanced(id):
+        """Atualizar status do lead com automações"""
+        data = request.get_json()
+        new_status = data.get('status')
+        notes = data.get('notes')
+        
+        result = LeadManager.update_lead_status(id, new_status, current_user.id, notes)
+        
+        if result['success']:
+            flash(result['message'], 'success')
+        else:
+            flash(result['error'], 'error')
+        
+        return jsonify(result)
+
+    @app.route('/leads/new-advanced', methods=['GET', 'POST'])
+    @login_required
+    def new_lead_advanced():
+        """Criar lead com validações avançadas"""
+        form = LeadForm()
+        
+        # Carregar opções para selects
+        form.client_id.choices = [(0, 'Selecione...')] + [(c.id, c.name) for c in Client.query.all()]
+        form.user_id.choices = [(u.id, f"{u.first_name} {u.last_name}") for u in User.query.filter_by(active=True).all()]
+        
+        if form.validate_on_submit():
+            lead_data = {
+                'title': form.title.data,
+                'description': form.description.data,
+                'value': form.value.data,
+                'priority': form.priority.data,
+                'source': form.source.data,
+                'expected_close_date': form.expected_close_date.data,
+                'client_id': form.client_id.data if form.client_id.data != 0 else None
+            }
+            
+            result = LeadManager.create_lead_with_validation(lead_data, form.user_id.data)
+            
+            if result['success']:
+                flash(result['message'], 'success')
+                return redirect(url_for('leads'))
+            else:
+                flash(result['error'], 'error')
+        
+        return render_template('leads/form_advanced.html', form=form, title='Novo Lead Profissional')
+
+    @app.route('/leads/analytics')
+    @login_required
+    def leads_analytics_page():
+        """Página de análises de leads"""
+        return render_template('leads/analytics.html')
+
+    @app.route('/leads/forecast')
+    @login_required
+    def leads_forecast_page():
+        """Página de previsão de receita"""
+        return render_template('leads/forecast.html')
 
     # ERROR HANDLERS
     @app.errorhandler(404)
